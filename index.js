@@ -43,12 +43,20 @@ app.use(cors());
 // Middleware para servir arquivos estáticos
 // No Vercel, você deve usar um serviço de armazenamento externo
 if (process.env.VERCEL !== '1') {
-    // Servir arquivos de public/uploads (novos uploads)
-    app.use("/files", express.static(path.resolve(__dirname, "public", "uploads")));
+    const publicUploadsPath = path.join(__dirname, "public", "uploads");
+    const uploadsPath = path.join(__dirname, "uploads");
     
-    // Manter compatibilidade com uploads antigos
-    app.use("/files", express.static(path.resolve(__dirname, "uploads")));
+    console.log('📁 Configurando servir arquivos estáticos:');
+    console.log('   /files -> ', publicUploadsPath);
+    console.log('   /files -> ', uploadsPath);
+    
+    // Servir arquivos de public/uploads (NOVO - PRIORIDADE)
+    app.use("/files", express.static(publicUploadsPath));
+    
+    // Servir arquivos de uploads (ANTIGO - FALLBACK)
+    app.use("/files", express.static(uploadsPath));
 } else {
+    console.log('⚠️ Arquivos estáticos desabilitados (modo Vercel)');
     // Redirecionar arquivos para um CDN ou serviço de storage
     app.use("/files", (req, res) => {
         // Exemplo: redirecionar para Cloudinary ou S3
