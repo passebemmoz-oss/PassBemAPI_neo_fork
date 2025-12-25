@@ -175,5 +175,64 @@ module.exports = {
             })
         }
         
+    },
+
+    async deleteMany(request, response){
+        const { ids } = request.body;
+
+        if(!ids || !Array.isArray(ids) || ids.length === 0){
+            return response.status(400).json({
+                error: "É necessário enviar uma lista de IDs válida"
+            });
+        }
+
+        try{
+            // Buscar todas as perguntas para contar por tema
+            const perguntas = await Pergunta.find({ _id: { $in: ids } });
+            
+            if(perguntas.length === 0){
+                return response.status(404).json({
+                    message: "Nenhuma questão encontrada com os IDs fornecidos"
+                });
+            }
+
+            // Contar quantas perguntas por tema para atualizar o contador
+            const temaCount = {};
+            perguntas.forEach(pergunta => {
+                const temaId = pergunta.tema_id.toString();
+                temaCount[temaId] = (temaCount[temaId] || 0) + 1;
+            });
+
+            // Deletar as perguntas
+            const result = await Pergunta.deleteMany({ _id: { $in: ids } });
+
+            // Atualizar o contador de cada tema
+            const updatePromises = Object.entries(temaCount).map(([temaId, count]) => {
+                return Temas.updateOne(
+                    { _id: temaId },
+                    { "$inc": { numero: -count } }
+                );
+            });
+
+            await Promise.all(updatePromises);
+
+            return response.status(200).json({
+                message: "Questões apagadas com sucesso!",
+                deletedCount: result.deletedCount,
+                requestedIds: ids.length,
+                details: {
+                    found: perguntas.length,
+                    deleted: result.deletedCount
+                }
+            });
+
+        } catch (error) {
+            return response.status(500).json({
+                messagem: 'Erro ao deletar questões',
+                type: "Refused",
+                error_detalhe: error.message,
+                data: {},
+            });
+        }
     }
 }

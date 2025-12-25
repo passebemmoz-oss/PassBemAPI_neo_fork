@@ -184,17 +184,470 @@ O Super Administrador tem acesso completo a:
 
 ## 📱 Aplicativo Mobile
 
-A API suporta endpoints específicos para o aplicativo mobile:
+A API suporta endpoints específicos para o aplicativo mobile. Abaixo a documentação completa com payloads e respostas.
 
-### Usuários App
-- `POST /appuser` - Criar usuário app
-- `GET /appuser` - Login app
-- `POST /appuserinf` - Informações do usuário (com imagem)
+### Autenticação e Usuários
 
-### Conteúdo App
-- `GET /apptemas` - Temas para app
-- `GET /appmodulos` - Módulos para app
-- `GET /appmodulos/:_id` - Módulo específico
+#### POST /appuser
+- **Descrição**: Cria um novo usuário no aplicativo.
+- **Payload da Requisição**:
+  ```json
+  {
+    "numero": "string",
+    "senha": "string"
+  }
+  ```
+- **Resposta de Sucesso**:
+  ```json
+  "Sua conta foi criada com sucesso!"
+  ```
+- **Resposta de Erro** (usuário já existe):
+  ```json
+  "Este contacto encontra-se associado a uma conta."
+  ```
+
+#### GET /appuser
+- **Descrição**: Faz login do usuário.
+- **Cabeçalhos da Requisição**:
+  ```
+  numero: string
+  senha: string
+  ```
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "_id": "user_id",
+    "numero": "string",
+    "senha": "string",
+    "user_inf": {
+      // dados populados do usuário
+    }
+  }
+  ```
+- **Respostas de Erro**:
+  - 404: `{ "error": "Nenhuma conta associada a este número!" }`
+  - 401: `{ "error": "Senha Invalida" }`
+
+#### POST /appuserinf
+- **Descrição**: Cria ou atualiza informações adicionais do usuário (com upload de imagem).
+- **Payload da Requisição** (form-data):
+  ```
+  nome: string
+  provincia: string
+  distrito: string
+  telefone: string
+  email: string
+  idade: string
+  genero: string
+  categoria: string
+  escola: string
+  viatura: string
+  datacomprar: string
+  classecaro: string
+  notificacao: string
+  nivelacademico: string
+  imagem: file (opcional)
+  ```
+- **Cabeçalhos da Requisição**:
+  ```
+  authorization: user_id
+  ```
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "messagem": "Perfil atualizado com sucesso!",
+    "appUser": {
+      // objeto do usuário atualizado
+    }
+  }
+  ```
+
+#### PUT /appuserinf
+- **Descrição**: Obtém informações do usuário.
+- **Payload da Requisição**:
+  ```json
+  {
+    "user": "telefone"
+  }
+  ```
+- **Resposta de Sucesso**:
+  ```json
+  {
+    // objeto UserInf
+  }
+  ```
+
+### Temas e Perguntas
+
+#### GET /apptemas
+- **Descrição**: Lista todos os temas disponíveis no aplicativo.
+- **Cabeçalhos da Requisição**:
+  ```
+  authorization: user_id
+  ```
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "temas": [
+      // array de temas
+    ],
+    "creditos": {
+      // objeto de créditos do usuário
+    }
+  }
+  ```
+
+#### POST /apptemas
+- **Descrição**: Inicia uma prova baseada em um tema.
+- **Payload da Requisição**:
+  ```json
+  {
+    "item": {
+      "_id": "tema_id",
+      "nome": "nome_do_tema"
+    },
+    "tipo": "Tematica"
+  }
+  ```
+- **Cabeçalhos da Requisição**:
+  ```
+  authorization: user_id
+  ```
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "results": [
+      // array de perguntas
+    ],
+    "prova": {
+      // objeto da prova criada
+    }
+  }
+  ```
+
+### Módulos e Cursos
+
+#### GET /appmodulos
+- **Descrição**: Lista todos os módulos disponíveis.
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "messagem": "Voce carregou os cursos com sucesso!",
+    "data": {
+      "modulos": [
+        // array de módulos
+      ],
+      "videosaulas": [
+        // array de vídeos
+      ]
+    }
+  }
+  ```
+
+#### GET /appmodulos/:_id
+- **Descrição**: Obtém detalhes de um módulo específico, incluindo vídeos e perguntas.
+- **Parâmetros da URL**: `_id` (ID do módulo)
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "videos": [
+      // array de vídeos do módulo
+    ],
+    "perguntas": [
+      // array de perguntas do módulo
+    ]
+  }
+  ```
+
+### Provas
+
+#### POST /fazerprova
+- **Descrição**: Submete uma prova realizada pelo usuário.
+- **Payload da Requisição**:
+  ```json
+  {
+    "ProvaFeita": [
+      {
+        "userOption": "resposta",
+        "prova": "prova_id",
+        "questao": "questao_id"
+      }
+    ],
+    "pts": 85
+  }
+  ```
+- **Cabeçalhos da Requisição**:
+  ```
+  authorization: user_id
+  ```
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "message": "Teste salvo com sucesso",
+    "data": {
+      // objeto da prova atualizada
+    }
+  }
+  ```
+
+#### POST /fazerprovamodular
+- **Descrição**: Submete uma prova modular realizada pelo usuário.
+- **Payload da Requisição**:
+  ```json
+  {
+    "ProvaFeita": [
+      {
+        "userOption": "resposta",
+        "questao": "questao_id"
+      }
+    ],
+    "pts": 90,
+    "modulo": {
+      "nome": "nome_modulo",
+      "_id": "modulo_id"
+    }
+  }
+  ```
+- **Cabeçalhos da Requisição**:
+  ```
+  authorization: user_id
+  ```
+- **Resposta de Sucesso**: Status 200 (sem corpo)
+
+#### GET /provasuser
+- **Descrição**: Lista as provas do usuário.
+- **Cabeçalhos da Requisição**:
+  ```
+  authorization: user_id
+  ```
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "message": "Sucesso!",
+    "response": [
+      // array de provas normais
+    ],
+    "modulares": [
+      // array de provas modulares
+    ]
+  }
+  ```
+
+#### GET /respstaprova/:id
+- **Descrição**: Obtém respostas de uma prova específica.
+- **Parâmetros da URL**: `id` (ID da prova)
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "message": "Sucesso!",
+    "resposta": [
+      // array de respostas populadas
+    ]
+  }
+  ```
+
+#### GET /respstaprovamodular/:id
+- **Descrição**: Obtém respostas de uma prova modular específica.
+- **Parâmetros da URL**: `id` (ID da prova modular)
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "message": "Sucesso!",
+    "resposta": [
+      // array de respostas populadas
+    ]
+  }
+  ```
+
+### Chat
+
+#### GET /chatall
+- **Descrição**: Lista todas as mensagens de chat.
+- **Cabeçalhos da Requisição**:
+  ```
+  authorization: user_id
+  ```
+- **Resposta de Sucesso**:
+  ```json
+  [
+    // array de mensagens de chat
+  ]
+  ```
+
+#### POST /chattext
+- **Descrição**: Envia uma mensagem de texto no chat.
+- **Payload da Requisição**:
+  ```json
+  {
+    "text": "mensagem",
+    "name": "nome_usuario",
+    "avatar": "url_avatar"
+  }
+  ```
+- **Cabeçalhos da Requisição**:
+  ```
+  authorization: user_id
+  ```
+- **Resposta de Sucesso**: Status 200 com "created"
+
+#### POST /chatimagem
+- **Descrição**: Envia uma imagem no chat.
+- **Payload da Requisição** (form-data):
+  ```
+  name: string
+  avatar: string
+  imagem: file
+  ```
+- **Cabeçalhos da Requisição**:
+  ```
+  authorization: user_id
+  ```
+- **Resposta de Sucesso**: Status 200 com "created"
+
+#### POST /chatvideo
+- **Descrição**: Envia um vídeo no chat.
+- **Payload da Requisição** (form-data):
+  ```
+  name: string
+  avatar: string
+  video: file
+  ```
+- **Cabeçalhos da Requisição**:
+  ```
+  authorization: user_id
+  ```
+- **Resposta de Sucesso**: Status 200 com "created"
+
+### Pagamentos e Créditos
+
+#### POST /recaregarmais
+- **Descrição**: Recarrega créditos via M-Pesa.
+- **Payload da Requisição**:
+  ```json
+  {
+    "pacote": "Diario",
+    "numero": "numero_telefone"
+  }
+  ```
+- **Cabeçalhos da Requisição**:
+  ```
+  authorization: user_id
+  ```
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "status": "200 ok",
+    "message": "Parabéns você tem mais X dias para estudar sem limites",
+    "atividade": 30
+  }
+  ```
+
+#### GET /histypyments
+- **Descrição**: Obtém histórico de pagamentos.
+- **Cabeçalhos da Requisição**:
+  ```
+  authorization: user_id
+  ```
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "status": "200 ok",
+    "message": "",
+    "value": [
+      // array de histórico de pagamentos
+    ]
+  }
+  ```
+
+#### GET /getcredity
+- **Descrição**: Obtém créditos do usuário.
+- **Cabeçalhos da Requisição**:
+  ```
+  authorization: user_id
+  ```
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "status": "200 ok",
+    "message": "",
+    "value": {
+      // objeto de créditos
+    }
+  }
+  ```
+
+#### POST /manualcharge
+- **Descrição**: Carrega créditos manualmente (admin).
+- **Payload da Requisição**:
+  ```json
+  {
+    "pacote": "Diario",
+    "numero": "numero_telefone",
+    "id": "admin_id",
+    "name": "admin_name"
+  }
+  ```
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "status": "200 ok",
+    "message": "Parabéns você tem mais X dias para estudar sem limites"
+  }
+  ```
+
+### Materiais Didáticos
+
+#### GET /appmaterial/:categoria
+- **Descrição**: Lista materiais por categoria.
+- **Parâmetros da URL**: `categoria` (categoria do material)
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "message": "Busca de Material realizada com sucesso!",
+    "value": [
+      // array de materiais
+    ]
+  }
+  ```
+
+### Notificações Push
+
+#### POST /updatePushToken
+- **Descrição**: Atualiza o token de push do usuário.
+- **Payload da Requisição**:
+  ```json
+  {
+    "pushToken": "expo_push_token",
+    "phoneNumber": "numero_telefone"
+  }
+  ```
+- **Cabeçalhos da Requisição**:
+  ```
+  authorization: user_id
+  ```
+- **Resposta de Sucesso**:
+  ```json
+  {
+    "error": false,
+    "message": "Token de notificação criado/atualizado com sucesso"
+  }
+  ```
+
+#### GET /GetUsersPushs
+- **Descrição**: Obtém lista de usuários com tokens de push.
+- **Resposta de Sucesso**:
+  ```json
+  [
+    // array de usuários com push tokens
+  ]
+  ```
+
+### Notas Gerais para Mobile
+- Todas as rotas utilizam JSON para requisições e respostas, exceto onde especificado upload de arquivos (form-data).
+- Autenticação é baseada em `numero` e `senha` via cabeçalhos ou corpo, e `authorization` header para user_id em rotas protegidas.
+- Uploads de imagem/vídeo usam `multer` com campo "imagem" ou "video".
+- Erros retornam status apropriados (400, 401, 404, 500) com mensagens em português.
+- Campos obrigatórios são indicados; outros são opcionais.
 
 ## 🗄 Banco de Dados
 

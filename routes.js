@@ -102,6 +102,7 @@ routes.post("/questoes", upload.single("imagem"), PerguntaController.create)
 routes.get("/questoes", PerguntaController.index)
 routes.put("/questoes", upload.single("imagem"), PerguntaController.update)
 routes.delete("/questoes/:id",  PerguntaController.delete)
+routes.post("/questoes/delete-many", PerguntaController.deleteMany)
 
 /// Rotas para modulos
 routes.post("/modulos", ModuloController.create);
