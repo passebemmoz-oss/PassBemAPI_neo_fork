@@ -1,0 +1,52 @@
+# Configuração do Coolify
+# Este arquivo informa ao Coolify para usar Docker Compose
+
+version: "3.8"
+
+services:
+  app:
+    image: mowosocw4sgwsk84kw4ks40c:${SOURCE_COMMIT:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile.coolify
+    container_name: ${COOLIFY_CONTAINER_NAME:-passbem-api}
+    restart: unless-stopped
+    ports:
+      - "3333:3333"
+    environment:
+      - NODE_ENV=production
+      - PORT=3333
+      - HOST=0.0.0.0
+      - MONGODB_URL=${MONGODB_URL}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - COOLIFY_URL=${COOLIFY_URL}
+      - COOLIFY_FQDN=${COOLIFY_FQDN}
+      - COOLIFY_BRANCH=${COOLIFY_BRANCH}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3333/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - coolify
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.gzip.compress=true"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.http-0-mowosocw4sgwsk84kw4ks40c.entryPoints=http"
+      - "traefik.http.routers.http-0-mowosocw4sgwsk84kw4ks40c.middlewares=gzip"
+      - "traefik.http.routers.http-0-mowosocw4sgwsk84kw4ks40c.rule=Host(`mowosocw4sgwsk84kw4ks40c.62.171.183.132.sslip.io`)"
+      - "traefik.http.routers.http-0-mowosocw4sgwsk84kw4ks40c.service=http-0-mowosocw4sgwsk84kw4ks40c"
+      - "traefik.http.services.http-0-mowosocw4sgwsk84kw4ks40c.loadbalancer.server.port=3333"
+      - "caddy_0.encode=zstd gzip"
+      - "caddy_0.handle_path.0_reverse_proxy={{upstreams 3333}}"
+      - "caddy_0.header=-Server"
+      - "caddy_0.try_files={path} /index.html /index.php"
+      - "caddy_0=http://mowosocw4sgwsk84kw4ks40c.62.171.183.132.sslip.io"
+      - "caddy_ingress_network=coolify"
+
+networks:
+  coolify:
+    external: true
+    name: coolify

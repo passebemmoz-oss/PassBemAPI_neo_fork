@@ -1,0 +1,5 @@
+# Nixpacks Configuration
+# Desabilita Nixpacks para usar Docker customizado
+
+# Este arquivo força o Coolify a NÃO usar Nixpacks
+providers = []

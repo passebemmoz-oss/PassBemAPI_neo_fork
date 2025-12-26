@@ -20,12 +20,12 @@
     "socket.io": "^4.1.2"
   },
   "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js",
+    "dev": "nodemon server.js",
+    "start": "node server.js",
     "create-admin": "node src/scripts/createSuperAdmin.js",
     "migrate:filenames": "node scripts/migrate-filenames.js",
-    "build": "echo 'No build step required'",
-    "health": "node -e \"console.log('OK')\"",
+    "build": "echo 'Build step not required for this project' && exit 0",
+    "health": "curl -f http://localhost:3333/health || exit 1",
     "docker:build": "docker build -f Dockerfile.coolify -t passbem-api .",
     "docker:run": "docker run -p 3333:3333 passbem-api"
   },
