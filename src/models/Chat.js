@@ -45,14 +45,14 @@ const ChatSchema = new mongoose.Schema({
 
 ChatSchema.virtual(`image`).get(function(){
     if(this.image_name){
-        return `https://api.passebem.co.mz/files/${this.image_name}`
+        return `http://mowosocw4sgwsk84kw4ks40c.62.171.183.132.sslip.io/files/${this.image_name}`
     }
     
 })
 
 ChatSchema.virtual(`video`).get(function(){
     if(this.video_name){
-        return `https://api.passebem.co.mz/files/${this.video_name}`
+        return `http://mowosocw4sgwsk84kw4ks40c.62.171.183.132.sslip.io/files/${this.video_name}`
     }
     
 })

@@ -28,7 +28,7 @@ const InfAppSchema = new mongoose.Schema({
 })
 
 InfAppSchema.virtual(`perfil_url`).get(function(){
-    return `https://api.passebem.co.mz/files/${this.imagem}`
+    return `http://mowosocw4sgwsk84kw4ks40c.62.171.183.132.sslip.io/files/${this.imagem}`
 })
 
 module.exports = mongoose.model("InfAppUser", InfAppSchema)

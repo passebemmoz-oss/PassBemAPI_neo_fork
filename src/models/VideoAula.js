@@ -17,7 +17,7 @@ const VideoAulaShema = new mongoose.Schema({
 })
 
 VideoAulaShema.virtual(`video_url`).get(function(){
-    return `https://api.passebem.co.mz/files/${this.imagem}`
+    return `http://mowosocw4sgwsk84kw4ks40c.62.171.183.132.sslip.io/files/${this.imagem}`
 })
 
 module.exports = mongoose.model("VideoAula", VideoAulaShema);
