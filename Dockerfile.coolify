@@ -29,9 +29,9 @@ RUN mkdir -p uploads public/uploads && \
 # Expor porta
 EXPOSE 3333
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+# Health check com timeout maior
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
     CMD curl -f http://localhost:3333/health || exit 1
 
-# Comando para iniciar
-CMD ["sh", "-c", "./init.sh && npm start"]
+# Comando para iniciar - apenas o servidor Node
+CMD ["node", "server.js"]
