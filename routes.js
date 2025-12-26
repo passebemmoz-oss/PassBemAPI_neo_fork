@@ -144,6 +144,8 @@ routes.post('/manualcharge', AppMpesa.ManualCredi)
 
 ///Material didadico
 routes.post('/material', upload.single("imagem"), MaterailController.create)
+routes.put('/material/:id', upload.single("imagem"), MaterailController.update)
+routes.delete('/material/:id', MaterailController.delete)
 routes.get('/material',  MaterailController.index)
 routes.get('/appmaterial/:categoria', MaterailController.indexOne);
 

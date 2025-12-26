@@ -1,7 +1,7 @@
 const app = require('./index');
 
 // Iniciar servidor (Coolify, produção e desenvolvimento)
-const port = process.env.PORT || 3333;
+const port = process.env.PORT || 3334;
 
 const server = app.listen(port, '0.0.0.0', () => {
     console.log(`✅ Servidor rodando na porta ${port}`);
