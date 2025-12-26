@@ -56,5 +56,86 @@ module.exports = {
                 data:{},
             })
         }
+    },
+
+    async update(request, response){
+        
+        const { id } = request.params;
+        const { nome, descricao } = request.body;
+
+        try{
+            // Verificar se o tema existe
+            const temaExiste = await Temas.findById(id);
+            
+            if(!temaExiste){
+                return response.status(404).json({
+                    message:'Tema não encontrado',
+                    type: "Not Found",
+                })
+            }
+
+            // Verificar se já existe outro tema com o mesmo nome
+            if(nome && nome !== temaExiste.nome){
+                const temaComMesmoNome = await Temas.findOne({ nome, _id: { $ne: id } });
+                
+                if(temaComMesmoNome){
+                    return response.json({
+                        message: "Já existe um tema com este nome!",
+                        type: "Conflict"
+                    })
+                }
+            }
+
+            // Preparar dados para atualização
+            const data = {
+                nome: nome || temaExiste.nome,
+                descricao: descricao || temaExiste.descricao,
+            }
+
+            const tema = await Temas.findByIdAndUpdate(id, data, { new: true });
+
+            return response.json({
+                message: "Tema atualizado com sucesso!",
+                value: tema
+            })
+
+        } catch (error) {
+            return response.status(500).json({
+                message:'Falha na atualização do tema',
+                type: "Refused",
+                error_detalhe:error,
+            })
+        }
+    },
+
+    async delete(request, response){
+        
+        const { id } = request.params;
+
+        try{
+            // Verificar se o tema existe
+            const temaExiste = await Temas.findById(id);
+            
+            if(!temaExiste){
+                return response.status(404).json({
+                    message:'Tema não encontrado',
+                    type: "Not Found",
+                })
+            }
+
+            await Temas.findByIdAndDelete(id);
+
+            return response.json({
+                message: "Tema excluído com sucesso!",
+                value: { id }
+            })
+
+        } catch (error) {
+            return response.status(500).json({
+                message:'Falha na exclusão do tema',
+                type: "Refused",
+                error_detalhe:error,
+            })
+        }
     }
 }

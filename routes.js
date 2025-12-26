@@ -91,6 +91,8 @@ routes.get("/professor", ProfessorController.index)
 
 ///// Rotas para temas
 routes.post("/temas", TemaController.create)
+routes.put("/temas/:id", TemaController.update)
+routes.delete("/temas/:id", TemaController.delete)
 routes.get("/temas", TemaController.index)
 
 /// App temas 
