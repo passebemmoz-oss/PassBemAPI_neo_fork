@@ -36,7 +36,7 @@ module.exports = {
         const user = req.headers.authorization
 
         try{
-            const histCreditos = await HistCreditos.find({user: user})
+            const histCreditos = await HistCreditos.find({user: user}).sort({ inscricao: -1 })
 
 
             return res.json({
