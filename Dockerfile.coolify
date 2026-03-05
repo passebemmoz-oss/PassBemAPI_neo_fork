@@ -34,4 +34,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
     CMD curl -f http://localhost:3333/health || exit 1
 
 # Comando para iniciar - apenas o servidor Node
-CMD ["node", "-e", "process.env.PORT=3333", "server.js"]
+CMD ["node", "server.js"]
